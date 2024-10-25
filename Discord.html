@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord-Rechner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        /* Grundlegender Dark-Mode-Style */
+        body {
+            background-color: #121212;
+            color: #E0E0E0;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            position: relative; /* Für die Positionierung des Ergebnisses */
+            padding: 10px; /* Padding für mobile Nutzung */
+            box-sizing: border-box; /* Box-sizing für korrekte Padding-Berechnung */
+        }
+
+        h1 {
+            color: #FF8C00; /* Orange */
+            font-weight: 500;
+            text-align: center; /* Zentriert den Titel */
+        }
+
+        label {
+            color: #00CED1; /* Türkis */
+            font-weight: 300;
+        }
+
+        input[type="text"] {
+            background-color: #333333;
+            color: #FFFFFF;
+            border: 2px solid #00CED1;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%; /* Vollständige Breite auf mobilen Geräten */
+            max-width: 300px; /* Maximale Breite für größere Bildschirme */
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #FF8C00; /* Orange */
+            color: #FFFFFF;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px; /* Angepasste Polsterung */
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin-left: 10px; /* Abstand zwischen Buttons */
+        }
+
+        button:hover {
+            background-color: #FFAA33; /* Hellere Orange */
+        }
+
+        h2 {
+            color: #00CED1; /* Türkis */
+            font-weight: 500;
+        }
+
+        .result-box {
+            background-color: #333333;
+            color: #FFFFFF;
+            padding: 10px;
+            border-radius: 5px;
+            width: fit-content;
+            margin-top: 10px;
+            border: 2px solid #00CED1; /* Türkis */
+            display: inline-block; /* Damit die Box sich an den Inhalt anpasst */
+        }
+
+        /* Ergebnis in der unteren rechten Ecke */
+        .final-result {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: #00CED1; /* Türkis */
+            color: #FFFFFF;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 18px;
+            display: none; /* Standardmäßig nicht anzeigen */
+        }
+
+        /* Flexbox für die Ergebnisanzeige und den Kopieren-Button */
+        .result-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Discord-Rechner</h1>
+    <label for="equation">Gib deine Rechnung ein:</label>
+    <input type="text" id="equation" placeholder="z.B. 7 + 9 - 7 * 5 / 2">
+    <button onclick="convertEquation()">Umwandeln</button>
+
+    <h2>Umgewandelte Rechnung:</h2>
+    <div class="result-container">
+        <div class="result-box" id="result">Hier erscheint die umgewandelte Rechnung</div>
+        <button onclick="copyToClipboard()">Kopieren</button>
+    </div>
+
+    <div class="final-result" id="finalResult">Ergebnis: </div>
+
+    <script>
+        function convertEquation() {
+            let equation = document.getElementById("equation").value;
+
+            // Multiplikation ohne Leerzeichen konvertieren
+            equation = equation.replace(/(\d+)\s*\*\s*(\d+)/g, (match, a, b) => {
+                return Array(Number(b)).fill(a).join("+");
+            });
+
+            // Division ohne Leerzeichen konvertieren
+            equation = equation.replace(/(\d+)\s*\/\s*(\d+)/g, (match, a, b) => {
+                const quotient = Math.floor(a / b);
+                return Array(quotient).fill(b).join("+");
+            });
+
+            // Ergebnis ohne Leerzeichen ausgeben
+            const transformedEquation = equation.replace(/\s+/g, '');
+            document.getElementById("result").textContent = transformedEquation;
+
+            // Ergebnis berechnen
+            try {
+                const evalResult = eval(transformedEquation); // Die umgewandelte Rechnung auswerten
+                document.getElementById("finalResult").textContent = `Ergebnis: ${evalResult}`;
+                document.getElementById("finalResult").style.display = 'block'; // Ergebnis anzeigen
+            } catch (error) {
+                document.getElementById("finalResult").textContent = "Fehler bei der Berechnung"; // Fehlerfall
+                document.getElementById("finalResult").style.display = 'block'; // Ergebnis anzeigen
+            }
+        }
+
+        function copyToClipboard() {
+            const resultText = document.getElementById("result").textContent;
+            navigator.clipboard.writeText(resultText)
+                .then(() => {
+                    alert("Umgewandelte Rechnung kopiert: " + resultText);
+                })
+                .catch(err => {
+                    console.error("Fehler beim Kopieren: ", err);
+                });
+        }
+    </script>
+</body>
+</html>
